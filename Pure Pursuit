@@ -1,0 +1,18 @@
+def pure_pursuit_steer_from(path, rear_pos, yaw, lookahead, wheelbase, max_steer_rad, start_seg):
+    heading = (math.cos(yaw), math.sin(yaw))
+    look_pt, seg_idx, _ = find_lookahead_point_from(path, rear_pos, lookahead, start_seg, heading)
+    dx = look_pt[0] - rear_pos[0]
+    dy = look_pt[1] - rear_pos[1]
+    x_f =  math.cos(yaw)*dx + math.sin(yaw)*dy
+    y_l = -math.sin(yaw)*dx + math.cos(yaw)*dy
+    if x_f <= 0.0:
+        look_pt, seg_idx, _ = find_lookahead_point_from(path, rear_pos, lookahead, min(start_seg+1, len(path)-2), heading)
+        dx = look_pt[0] - rear_pos[0]; dy = look_pt[1] - rear_pos[1]
+        x_f =  math.cos(yaw)*dx + math.sin(yaw)*dy
+        y_l = -math.sin(yaw)*dx + math.cos(yaw)*dy
+    if abs(x_f) < 1e-9 and abs(y_l) < 1e-9:
+        return 0.0, look_pt, seg_idx
+    curvature = 2.0 * y_l / (lookahead**2)
+    steer = math.atan(curvature * wheelbase)
+    steer = max(-max_steer_rad, min(max_steer_rad, steer))
+    return steer, look_pt, seg_idx
