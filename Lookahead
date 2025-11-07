@@ -1,0 +1,43 @@
+def find_lookahead_point_from(path, pos, lookahead, start_seg, heading, max_seg_look=10):
+    px, py = pos
+    hx, hy = heading
+    n = len(path)
+    candidates = []
+    end_seg = min(n - 1, start_seg + max_seg_look)
+    for i in range(start_seg, end_seg):
+        x1, y1 = path[i]
+        x2, y2 = path[i + 1]
+        dx, dy = x2 - x1, y2 - y1
+        a = dx*dx + dy*dy
+        if a < 1e-12: continue
+        b = 2 * (dx*(x1 - px) + dy*(y1 - py))
+        c = (x1 - px)**2 + (y1 - py)**2 - lookahead**2
+        disc = b*b - 4*a*c
+        if disc < 0: continue
+        s = math.sqrt(disc)
+        for t in [(-b - s)/(2*a), (-b + s)/(2*a)]:
+            if 0.0 <= t <= 1.0:
+                lx, ly = x1 + t*dx, y1 + t*dy
+                if (lx - px)*hx + (ly - py)*hy > 1e-9:
+                    candidates.append((i, t, np.array([lx, ly])))
+    if candidates:
+        i_best, t_best, p_best = min(candidates, key=lambda k: (k[0], k[1]))
+        return p_best, i_best, t_best
+
+    if start_seg < n - 1:
+        x1, y1 = path[start_seg]
+        x2, y2 = path[start_seg + 1]
+        dx, dy = x2 - x1, y2 - y1
+        seg_len2 = dx*dx + dy*dy
+        if seg_len2 < 1e-12:
+            return find_lookahead_point_from(path, pos, lookahead, start_seg + 1, heading, max_seg_look)
+        t0 = ((px - x1)*dx + (py - y1)*dy) / seg_len2
+        seg_len = math.sqrt(seg_len2)
+        t_tar = min(1.0, max(0.0, t0) + lookahead/seg_len)
+        vx, vy = x1 + t_tar*dx, y1 + t_tar*dy
+        if (vx - px)*hx + (vy - py)*hy <= 0.0:
+            t_tar = min(1.0, t_tar + 1e-3)
+            vx, vy = x1 + t_tar*dx, y1 + t_tar*dy
+        return np.array([vx, vy]), start_seg, t_tar
+
+    return np.array(path[-1]), n - 2, 1.0
