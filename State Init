@@ -1,0 +1,23 @@
+num_joints = p.getNumJoints(robot)
+joint_map = {p.getJointInfo(robot, ji)[1].decode("utf-8"): ji for ji in range(num_joints)}
+print("Joint map:", joint_map)
+
+p.changeVisualShape(robot, -1, rgbaColor=[0.0, 0.0, 1.0, 0.7])
+p.changeDynamics(robot, -1, linearDamping=1.0, angularDamping=1.0)
+
+rear_x, rear_y, yaw = 0.5, 0.5, 0.0
+steer = 0.0
+trajectory = [(rear_x, rear_y)]
+path_done = False
+current_seg = 0
+max_steer = math.radians(MAX_STEER_DEG)
+prev_steer = 0.0
+
+traj_color = [0.0, 0.4, 1.0]
+heading_color = [0.0, 0.0, 0.0]
+look_color = [1.0, 0.0, 0.0]
+
+heading_line_id = None
+look_point_id = None
+sensor_circle_ids = []
+panel_text_id = None
