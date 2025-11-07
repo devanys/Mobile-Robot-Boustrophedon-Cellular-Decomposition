@@ -11,7 +11,7 @@ WHEEL_WID  = 0.10
 WHEEL_RADIUS = WHEEL_DIAM * 0.5
 
 V_BASE = 1.6
-DT = 1.0 / 60.0          # 60 FPS
+DT = 1.0 / 60.0          
 LOOKAHEAD = 0.8
 MAX_STEER_DEG = 60.0
 MAX_STEER_RATE = math.radians(60.0)
