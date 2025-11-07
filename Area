@@ -1,0 +1,14 @@
+def generate_lawnmower(x_min, x_max, y_min, y_max, spacing):
+    pts, y, direction = [], y_min, 1
+    while y <= y_max + 1e-9:
+        if direction == 1: pts += [(x_min, y), (x_max, y)]
+        else:               pts += [(x_max, y), (x_min, y)]
+        y += spacing
+        direction *= -1
+    out = []
+    for pnt in pts:
+        if not out or (abs(out[-1][0]-pnt[0])>1e-9 or abs(out[-1][1]-pnt[1])>1e-9):
+            out.append(pnt)
+    return np.array(out, dtype=float)
+
+path = generate_lawnmower(0.0, AREA_W, 0.0, AREA_H, LANE_SPACING)
